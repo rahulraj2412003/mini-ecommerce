@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 function Checkout() {
   const [cartItems, setCartItems] = useState([]);
   const [total, setTotal] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState("COD");
 
   const navigate = useNavigate();
   const token = localStorage.getItem("access");
@@ -36,7 +37,16 @@ function Checkout() {
       .catch(err => console.log(err));
   }, []);
 
-  const handleCheckout = () => {
+  const handlePayment = () => {
+    if (paymentMethod === "CARD") {
+      alert("Processing Card Payment 💳...");
+      setTimeout(placeOrder, 1500);  // simulate delay
+    } else {
+      placeOrder(); // COD → direct
+    }
+  };
+
+  const placeOrder = () => {
     API.post(
       "orders/place/",
       {},
@@ -47,20 +57,12 @@ function Checkout() {
       }
     )
       .then(res => {
-        console.log(res.data);
-
-        alert("Order placed successfully 🎉");
-
-        navigate("/products"); // Redirect after order
+        alert("Payment successful & Order placed 🎉");
+        navigate("/orders");
       })
       .catch(err => {
         console.log(err);
-
-        if (err.response?.data?.error) {
-          alert(err.response.data.error);
-        } else {
-          alert("Checkout failed ❌");
-        }
+        alert("Checkout failed ❌");
       });
   };
 
@@ -75,9 +77,7 @@ function Checkout() {
           {cartItems.map(item => (
             <div key={item.id}>
               <h3>{item.product_name}</h3>
-              <p>
-                ₹{item.product_price} × {item.quantity}
-              </p>
+              <p>₹{item.product_price} × {item.quantity}</p>
             </div>
           ))}
 
@@ -85,8 +85,20 @@ function Checkout() {
 
           <h3>Total: ₹{total.toFixed(2)}</h3>
 
-          <button onClick={handleCheckout}>
-            Place Order ✅
+          <h3>Select Payment Method</h3>
+
+          <select
+            value={paymentMethod}
+            onChange={e => setPaymentMethod(e.target.value)}
+          >
+            <option value="COD">Cash on Delivery (COD)</option>
+            <option value="CARD">Credit / Debit Card 💳</option>
+          </select>
+
+          <br /><br />
+
+          <button onClick={handlePayment}>
+            Pay & Place Order ✅
           </button>
         </>
       )}
