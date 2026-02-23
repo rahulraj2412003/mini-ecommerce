@@ -4,35 +4,40 @@ import API from "../api/axios";
 function Cart() {
   const [cartItems, setCartItems] = useState([]);
 
-  useEffect(() => {
-    const token = localStorage.getItem("access");
+  const token = localStorage.getItem("access");
 
+  useEffect(() => {
     API.get("cart/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
-      .then(res => {
-        console.log("CART DATA:", res.data);
-        setCartItems(res.data.cart_items);
-      })
-      .catch(err => {
-        console.log(err);
-        alert("Please login first 🔐");
-      });
+      .then(res => setCartItems(res.data.cart_items))
+      .catch(err => console.log(err));
   }, []);
 
-  const removeItem = (itemId) => {
-    const token = localStorage.getItem("access");
+  const updateQuantity = (itemId, newQty) => {
+    API.patch(
+      `cart/update/${itemId}/`,
+      { quantity: newQty },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then(res => {
+        console.log(res.data);
 
-    API.delete(`cart/remove/${itemId}/`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(() => {
-        alert("Item removed 🗑");
-        setCartItems(prev => prev.filter(item => item.id !== itemId));
+        if (newQty < 1) {
+          setCartItems(prev => prev.filter(item => item.id !== itemId));
+        } else {
+          setCartItems(prev =>
+            prev.map(item =>
+              item.id === itemId ? { ...item, quantity: newQty } : item
+            )
+          );
+        }
       })
       .catch(err => console.log(err));
   };
@@ -49,11 +54,20 @@ function Cart() {
             <img src={item.product_image} width="100" alt={item.product_name} />
             <h3>{item.product_name}</h3>
             <p>Price: ₹{item.product_price}</p>
-            <p>Quantity: {item.quantity}</p>
 
-            <button onClick={() => removeItem(item.id)}>
-              Remove 🗑
-            </button>
+            <div>
+              <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>
+                ➖
+              </button>
+
+              <span style={{ margin: "0 10px" }}>
+                {item.quantity}
+              </span>
+
+              <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>
+                ➕
+              </button>
+            </div>
           </div>
         ))
       )}
