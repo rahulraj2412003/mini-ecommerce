@@ -68,12 +68,13 @@ function Cart() {
                 ➕
               </button>
             </div>
-            <a href="/checkout">
-  <button>Proceed to Checkout 💳</button>
-</a>
+           
           </div>
         ))
       )}
+       <a href="/checkout">
+  <button>Proceed to Checkout 💳</button>
+</a>
     </div>
   );
 }
