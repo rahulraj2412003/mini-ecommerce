@@ -30,6 +30,7 @@ urlpatterns = [
     # ✅ App APIs
     path('api/', include('store.urls')),
     path('api/', include('cart.urls')),
+    path('api/', include('orders.urls')),
 
     # ✅ JWT Auth APIs
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

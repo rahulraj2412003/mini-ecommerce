@@ -1,21 +1,17 @@
 import { useEffect, useState } from "react";
 import API from "../api/axios";
 import { Link } from "react-router-dom";
+import "./Products.css";
 
 function Products() {
   const [products, setProducts] = useState([]);
 
-  // ✅ Fetch products on page load
   useEffect(() => {
     API.get("products/")
-      .then(res => {
-        console.log("PRODUCTS:", res.data);
-        setProducts(res.data);
-      })
-      .catch(err => console.log("API ERROR:", err));
+      .then(res => setProducts(res.data))
+      .catch(err => console.log(err));
   }, []);
 
-  // ✅ Add to Cart function
   const addToCart = (productId) => {
     const token = localStorage.getItem("access");
 
@@ -37,37 +33,30 @@ function Products() {
       }
     )
       .then(() => alert("Added to cart 🛒"))
-      .catch(err => {
-        console.log("CART ERROR:", err);
-        alert("Error adding to cart ❌");
-      });
+      .catch(err => console.log(err));
   };
 
   return (
-    <div>
-      <h2>Products</h2>
+    <div className="products-page">
+      <h2>Our Products 🛍</h2>
 
-      {products.length === 0 ? (
-        <p>Loading products...</p>
-      ) : (
-        products.map(p => (
-          <div key={p.id} style={{ marginBottom: "20px" }}>
+      <div className="products-grid">
+        {products.map(p => (
+          <div key={p.id} className="product-card">
             
-            {/* ✅ Clickable Product */}
-            <Link to={`/products/${p.id}`} style={{ textDecoration: "none", color: "black" }}>
+            <Link to={`/products/${p.id}`}>
+              <img src={p.image} alt={p.name} />
               <h3>{p.name}</h3>
-              <img src={p.image} width="150" alt={p.name} />
             </Link>
 
-            <p>₹{p.price}</p>
+            <p className="price">₹{p.price}</p>
 
-            {/* ✅ Add to Cart */}
             <button onClick={() => addToCart(p.id)}>
               Add to Cart ➕🛒
             </button>
           </div>
-        ))
-      )}
+        ))}
+      </div>
     </div>
   );
 }
