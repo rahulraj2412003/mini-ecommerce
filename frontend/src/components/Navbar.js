@@ -20,6 +20,7 @@ function Navbar() {
       <Link to="/" style={{ marginRight: "10px", color: "white" }}>Home</Link>
       <Link to="/products" style={{ marginRight: "10px", color: "white" }}>Products</Link>
       <Link to="/cart" style={{ marginRight: "10px", color: "white" }}>Cart</Link>
+      <Link to="/orders">My Orders</Link>
 
       {isLoggedIn ? (
         <button onClick={handleLogout} style={{ marginLeft: "10px" }}>
