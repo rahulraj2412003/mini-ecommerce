@@ -6,6 +6,10 @@ from django.shortcuts import get_object_or_404
 from cart.models import Cart, CartItem
 from .models import Order, OrderItem
 
+
+
+from .serializers import OrderSerializer
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def place_order(request):
@@ -37,4 +41,21 @@ def place_order(request):
     return Response({
         "message": "Order placed successfully 🎉",
         "order_id": order.id
+    })
+    
+    
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def order_history(request):
+    user = request.user
+
+    orders = Order.objects.filter(user=user).order_by('-created_at')
+
+    serializer = OrderSerializer(orders, many=True)
+
+    return Response({
+        "orders": serializer.data
     })
